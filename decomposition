@@ -1,0 +1,111 @@
+package baekjoon;
+
+import java.util.Scanner;
+import java.util.Vector;
+public class decomReaction 
+{
+	static int minCombi(Vector<Integer> sets,int diff)
+	{
+		if(diff==0)
+			return 0;
+		int res=Integer.MAX_VALUE;
+		for(int i=0;i<sets.size();i++)
+		{
+			if(sets.elementAt(i)<= diff)
+			{
+				int sub_res=minCombi(sets,diff - sets.elementAt(i));
+				if(sub_res != Integer.MAX_VALUE &&sub_res +1<res)
+					res=sub_res+1;
+			}
+		}
+		//if(res==Integer.MAX_VALUE)
+		//	System.out.println("impossible");
+		return res;
+	}
+
+	public static void main(String[] args) 
+	{
+		// TODO Auto-generated method stub
+		Scanner scanner=new Scanner(System.in);
+		int N,M;
+		N=scanner.nextInt();
+		M=scanner.nextInt();
+		int[] parent=new int[N+1];//but use from 1
+		int[] size=new int[N+1];
+		//for(int i=1;i<N+1;i++)
+		//	size[i]=1;
+		for(int i=0;i<N-1;i++)//union
+		{
+			size[i+1]=1;
+			int a,b;
+			a=scanner.nextInt();
+			b=scanner.nextInt();
+			if(a<b)//smaller one becomes the root=>a becomes root
+				parent[b]=a;
+			else
+				parent[a]=b;
+		}
+		size[N]=1;
+		//for(int i=1;i<N+1;i++)
+		//	System.out.print(size[i]+" ");
+		//System.out.println();
+		int[] stack=new int[N];
+		int stack_cnt=0;
+		int cnt=0;
+		
+		int cnt_ofchilds=0;
+		int root=-1;
+		
+		for(int i=1;i<N+1;i++)
+		{
+			if(parent[i]==0)//root
+			{
+				root=i;
+				stack[stack_cnt++]=i;
+				while(cnt!=N)
+				{
+					for(int j=1;j<N+1;j++)
+					{
+						if(parent[j]==stack[cnt])
+						{
+							stack[stack_cnt++]=j;
+						}
+					}
+					cnt++;
+				}
+				break;
+			}
+		}
+		for(int i=N-1;i>=0;i--)//create size array
+		{	size[parent[stack[i]]]+=size[stack[i]];
+			if(parent[i]==root)
+				cnt_ofchilds++;
+		}
+		System.out.println("ss"+cnt_ofchilds);
+		//for(int i=1;i<N+1;i++)
+		//	System.out.print(size[i]+" ");
+
+		int diff=N-M;
+		//Vector<Integer> sets=new Vector<Integer>();
+		int[] childs=new int[cnt_ofchilds];
+		int a=0;
+		for(int i=1;i<N+1;i++)
+		{	
+			if(size[i]==M || size[i]==diff || M==1)//trivial case
+			{
+				System.out.println("1");
+				return;
+			}
+			if(parent[i]==root)//add to sets child of the root
+			{	//sets.add(size[i]);
+				childs[a++]=size[i];
+			}
+		}
+		for(int q=0;q<cnt_ofchilds;q++)
+			System.out.print(childs[q]+"  ");
+		System.out.println(childs);
+		//System.out.println(minCombi(sets, diff));
+
+		scanner.close();
+	}
+}
